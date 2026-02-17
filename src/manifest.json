@@ -1,7 +1,7 @@
 {
-  "name": "Stixify Extension",
-  "description": "Convert webpages to PDF and submit to Stixify for STIX translation",
-  "homepage_url": "https://github.com/dogesec/stixify-extension",
+  "name": "Stixify",
+  "description": "Submit webpages to Stixify to convert into structured threat intelligence.",
+  "homepage_url": "https://github.com/muchdogesec/stixify_chrome_extension",
   "version": "0.0.1",
   "manifest_version": 3,
   "action": {
