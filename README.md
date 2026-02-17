@@ -92,10 +92,10 @@ stixify_chrome_extension/
 └── dist/                     # Built extension (generated)
 ```
 
-## License
-
-See the LICENSE file for details.
-
 ## Support
 
-For issues and questions, please visit the [GitHub Issues](https://github.com/muchdogesec/stixify_chrome_extension/issues) page.
+[Minimal support provided via the dogesec community](https://community.dogesec.com/).
+
+## License
+
+[Apache 2.0](/LICENSE).
