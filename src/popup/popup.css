@@ -1,0 +1,448 @@
+/* General Styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  width: 500px;
+  min-height: 300px;
+  max-height: 600px;
+  background-color: #f8f9fa;
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+}
+
+.container {
+  padding: 16px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.header .logo {
+  height: 48px;
+  width: auto;
+  background-color: rgba(2, 145, 38, 0.708);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 20px;
+  color: #333;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.icon-btn:hover {
+  background-color: #e0e0e0;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 10px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  color: #666;
+  font-weight: 500;
+  position: relative;
+}
+
+.tab-btn:hover {
+  color: #333;
+  background-color: #f5f5f5;
+}
+
+.tab-btn.active {
+  color: #4CAF50;
+  border-bottom-color: #4CAF50;
+}
+
+.badge {
+  display: inline-block;
+  background-color: #ff5722;
+  color: white;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: 4px;
+  font-weight: bold;
+}
+
+.tab-content {
+  animation: fadeIn 0.3s ease-in;
+}
+
+/* State Management */
+.state {
+  animation: fadeIn 0.3s ease-in;
+}
+
+/* Vue transition classes */
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Loading State */
+.loader {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #4CAF50;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+#loadingState p {
+  text-align: center;
+  color: #666;
+}
+
+/* Account Info */
+.account-info {
+  display: flex;
+  justify-content: space-between;
+  background-color: #e8f5e9;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: #2e7d32;
+}
+
+/* Form Styles */
+.form-group {
+  margin-bottom: 16px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  font-size: 13px;
+  color: #333;
+}
+
+input[type="text"],
+input[type="number"],
+select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+.help-text {
+  font-size: 11px;
+  color: #777;
+  margin-top: 4px;
+}
+
+/* Sources List */
+.sources-list {
+  margin-bottom: 8px;
+}
+
+.source-item {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.source-item input {
+  flex: 1;
+}
+
+.source-item button {
+  padding: 8px 12px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.source-item button:hover {
+  background-color: #da190b;
+}
+
+/* Buttons */
+.btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s, opacity 0.3s;
+  font-family: inherit;
+}
+
+.btn-primary {
+  background-color: #4CAF50;
+  color: white;
+  width: 100%;
+}
+
+.btn-primary:hover {
+  background-color: #45a049;
+}
+
+.btn-primary:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background-color: #2196F3;
+  color: white;
+  width: 100%;
+}
+
+.btn-secondary:hover {
+  background-color: #0b7dda;
+}
+
+.btn-small {
+  background-color: #f5f5f5;
+  color: #333;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.btn-small:hover {
+  background-color: #e0e0e0;
+}
+
+.form-actions {
+  margin-top: 20px;
+}
+
+.btn-loader {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #ffffff;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Warning/Error/Success States */
+.warning,
+.error,
+.success {
+  text-align: center;
+  padding: 20px;
+}
+
+.warning {
+  background-color: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 4px;
+  color: #856404;
+}
+
+.error {
+  background-color: #f8d7da;
+  border: 1px solid #f44336;
+  border-radius: 4px;
+  color: #721c24;
+}
+
+.success {
+  background-color: #d4edda;
+  border: 1px solid #4CAF50;
+  border-radius: 4px;
+  color: #155724;
+}
+
+.warning p:first-child,
+.error p:first-child,
+.success p:first-child {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0 0 10px 0;
+}
+
+.warning .help-text,
+.error .help-text,
+.success .help-text {
+  color: inherit;
+  opacity: 0.8;
+  margin-bottom: 16px;
+}
+
+/* Jobs Tab */
+.jobs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.jobs-header h2 {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+}
+
+.empty-state p:first-child {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.jobs-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.jobs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.jobs-table thead {
+  background-color: #f5f5f5;
+  position: sticky;
+  top: 0;
+}
+
+.jobs-table th {
+  text-align: left;
+  padding: 8px;
+  font-weight: 600;
+  color: #666;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.jobs-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+}
+
+.jobs-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+.job-name {
+  font-weight: 500;
+  color: #333;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.job-state {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.job-state.processing,
+.job-state.queued {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.job-state.completed {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.job-state.failed {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.job-time {
+  color: #666;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.job-time.pending {
+  color: #999;
+  font-style: italic;
+}
