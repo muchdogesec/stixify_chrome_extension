@@ -2,7 +2,7 @@
   "name": "Stixify",
   "description": "Submit webpages to Stixify to convert into structured threat intelligence.",
   "homepage_url": "https://github.com/muchdogesec/stixify_chrome_extension",
-  "version": "0.0.1",
+  "version": "1.0.2",
   "manifest_version": 3,
   "action": {
     "default_title": "Stixify - Save page to STIX",
