@@ -1,0 +1,37 @@
+{
+  "name": "Stixify",
+  "description": "Submit webpages to Stixify to convert into structured threat intelligence.",
+  "homepage_url": "https://github.com/muchdogesec/stixify_chrome_extension",
+  "version": "0.0.1",
+  "manifest_version": 3,
+  "action": {
+    "default_title": "Stixify - Save page to STIX",
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "assets/icons/icon16.png",
+      "32": "assets/icons/icon32.png",
+      "64": "assets/icons/icon64.png",
+      "128": "assets/icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "assets/icons/icon16.png",
+    "32": "assets/icons/icon32.png",
+    "64": "assets/icons/icon64.png",
+    "128": "assets/icons/icon128.png"
+  },
+  "background": {
+    "service_worker": "src/background/background.js"
+  },
+  "options_page": "src/options/options.html",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs",
+    "pageCapture"
+  ],
+  "host_permissions": [
+    "https://*/*",
+    "http://*/*"
+  ]
+}
