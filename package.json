@@ -1,6 +1,6 @@
 {
   "name": "stixify-chrome-extension",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "type": "module",
   "scripts": {
     "build": "npm run sync-version && npm run icons && vite build && node scripts/copy-files.js",
