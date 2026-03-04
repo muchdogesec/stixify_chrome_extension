@@ -57,6 +57,86 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
 })
 
+// Check if content type is HTML
+function isHtmlContentType (contentType) {
+  if (!contentType) return true // Default to enabled if unknown
+  const type = contentType.toLowerCase()
+  return type.includes('text/html') || type.includes('text/plain')
+}
+
+// Update extension icon and title based on page type
+function updateActionState (tabId, contentType) {
+  if (isHtmlContentType(contentType)) {
+    chrome.action.enable(tabId)
+    const iconPaths = {
+      16: chrome.runtime.getURL('assets/icons/icon16.png'),
+      32: chrome.runtime.getURL('assets/icons/icon32.png'),
+      64: chrome.runtime.getURL('assets/icons/icon64.png'),
+      128: chrome.runtime.getURL('assets/icons/icon128.png')
+    }
+    chrome.action.setIcon({
+      tabId,
+      path: iconPaths
+    })
+    chrome.action.setTitle({
+      tabId,
+      title: 'Stixify - Save page to STIX'
+    })
+  } else {
+    setDisabledState(
+      tabId,
+      'The Stixify Chrome Extension can only submit webpages. Please upload files inside the Stixify app directly.'
+    )
+  }
+}
+
+function setDisabledState (tabId, message) {
+  // Use absolute paths from extension root
+  const iconPaths = {
+    16: chrome.runtime.getURL('assets/icons/icon16-disabled.png'),
+    32: chrome.runtime.getURL('assets/icons/icon32-disabled.png'),
+    64: chrome.runtime.getURL('assets/icons/icon64-disabled.png'),
+    128: chrome.runtime.getURL('assets/icons/icon128-disabled.png')
+  }
+
+  chrome.action.setIcon({
+    tabId,
+    path: iconPaths
+  })
+  chrome.action.setTitle({
+    tabId,
+    title: message
+  })
+  chrome.action.disable(tabId)
+}
+
+// Listen for tab activation to update state
+chrome.tabs.onActivated.addListener(async activeInfo => {
+  handlePageTypeChange(activeInfo.tabId)
+})
+
+async function handlePageTypeChange (tabId) {
+  setDisabledState(
+    tabId,
+    'The Stixify Chrome Extension could not determine the page type. Please refresh the page or upload files inside the Stixify app directly.'
+  )
+  try {
+    let pageType = await chrome.tabs.sendMessage(tabId, {
+      action: 'checkPageType'
+    })
+    updateActionState(tabId, pageType.contentType)
+  } catch (error) {
+    // If we can't get content type, default to enabled (e.g. for new tab or unsupported pages)
+    console.warn('Could not determine page content type:', error)
+  }
+}
+
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  if (changeInfo.status === 'complete') {
+    handlePageTypeChange(tabId)
+  }
+})
+
 // Handle tab capture
 async function handleCaptureTab (tabId) {
   try {
