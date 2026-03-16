@@ -206,6 +206,26 @@ select:focus {
   margin-top: 4px;
 }
 
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.checkbox-row input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+  cursor: pointer;
+}
+
+.checkbox-label {
+  display: inline;
+  font-weight: normal;
+  margin-bottom: 0;
+  cursor: pointer;
+}
+
 /* Sources List */
 .sources-list {
   margin-bottom: 8px;

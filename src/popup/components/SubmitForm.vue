@@ -30,19 +30,22 @@
 
       <div class="form-group">
         <label for="confidence">Confidence</label>
-        <input type="number" id="confidence" v-model.number="formData.confidence" min="0" max="100">
-        <div class="help-text">0-100</div>
+        <div class="checkbox-row">
+          <input type="checkbox" id="aiDefinesConfidence" v-model="formData.aiDefinesConfidence">
+          <label for="aiDefinesConfidence" class="checkbox-label">Let AI define confidence</label>
+        </div>
+        <input v-if="!formData.aiDefinesConfidence" type="number" id="confidence" v-model.number="formData.confidence" min="0" max="100" required>
+        <div v-if="!formData.aiDefinesConfidence" class="help-text">0-100</div>
       </div>
 
       <div class="form-group">
         <label for="tlpLevel">TLP Level *</label>
         <select id="tlpLevel" v-model="formData.tlpLevel" required>
-          <option value="clear">TLP:CLEAR</option>
-          <option value="white">TLP:WHITE</option>
-          <option value="green">TLP:GREEN</option>
-          <option value="amber">TLP:AMBER</option>
-          <option value="amber+strict">TLP:AMBER+STRICT</option>
           <option value="red">TLP:RED</option>
+          <option value="amber+strict">TLP:AMBER+STRICT</option>
+          <option value="amber">TLP:AMBER</option>
+          <option value="green">TLP:GREEN</option>
+          <option value="clear">TLP:CLEAR</option>
         </select>
       </div>
 
@@ -87,6 +90,7 @@ export default {
         mode: 'standard',
         reportName: '',
         labels: '',
+        aiDefinesConfidence: true,
         confidence: 50,
         tlpLevel: 'clear',
         sources: []
@@ -140,7 +144,7 @@ export default {
             .split(',')
             .map(l => l.trim())
             .filter(l => l).join(','),
-          confidence: this.formData.confidence,
+          confidence: this.formData.aiDefinesConfidence ? null : this.formData.confidence,
           tlpLevel: this.formData.tlpLevel,
           sources: this.formData.sources.filter(url => url.trim())
         };
@@ -207,7 +211,9 @@ export default {
       formDataPayload.append('file', mhtmlBlob, this.slugify(formData.reportName) + '.mhtml');
       formDataPayload.append('extraction_mode', formData.extraction_mode);
       formDataPayload.append('name', formData.reportName);
-      formDataPayload.append('confidence', formData.confidence);
+      if (formData.confidence !== null) {
+        formDataPayload.append('confidence', formData.confidence);
+      }
       formDataPayload.append('tlp_level', formData.tlpLevel);
 
       if (formData.labels.length > 0) {

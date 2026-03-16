@@ -8,7 +8,7 @@ const rootDir = join(__dirname, '..');
 const distDir = join(rootDir, 'dist');
 
 // Ensure dist/src directories exist
-const srcDirs = ['background'];
+const srcDirs = ['background', 'content'];
 srcDirs.forEach(dir => {
   const targetDir = join(distDir, 'src', dir);
   if (!existsSync(targetDir)) {
@@ -26,6 +26,10 @@ console.log('✓ Copied assets');
 // Copy background scripts
 cpSync(join(rootDir, 'src', 'background'), join(distDir, 'src', 'background'), { recursive: true });
 console.log('✓ Copied background scripts');
+
+// Copy content scripts
+cpSync(join(rootDir, 'src', 'content'), join(distDir, 'src', 'content'), { recursive: true });
+console.log('✓ Copied content scripts');
 
 // Copy manifest
 copyFileSync(join(rootDir, 'src', 'manifest.json'), join(distDir, 'manifest.json'));
