@@ -8,15 +8,6 @@ const __dirname = dirname(__filename);
 const rootDir = join(__dirname, '..');
 const distDir = join(rootDir, 'dist');
 
-// Ensure dist/src directories exist
-const srcDirs = ['background', 'content', 'popup', 'options', 'manifest.templ.json'];
-srcDirs.forEach(dir => {
-  const targetDir = join(distDir, 'src', dir);
-  if (!existsSync(targetDir)) {
-    mkdirSync(targetDir, { recursive: true });
-  }
-});
-
 // Copy files
 console.log('Copying extension files...');
 
