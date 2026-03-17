@@ -1,11 +1,10 @@
 {
   "name": "stixify-chrome-extension",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "type": "module",
   "scripts": {
-    "build": "npm run sync-version && npm run icons && vite build && node scripts/copy-files.js",
-    "icons": "node scripts/generate-icons.js",
-    "sync-version": "node scripts/sync-version.js"
+    "build": "npm run icons && vite build && node scripts/copy-files.js",
+    "icons": "node scripts/generate-icons.js"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
