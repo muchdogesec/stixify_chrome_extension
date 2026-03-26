@@ -181,9 +181,9 @@ async function fetchUserPlan (apiKey, apiEndpoint) {
   const reportsLeft =
     teamDetails.allowed_reports_per_month - teamDetails.month_upload_count
 
-  let planName = 'Free'
-  if (subscription && subscription.status === 'active') {
-    planName = subscription.items[0]?.price?.product_name || 'Full access'
+  let planName = 'None'
+  if (subscription && ['active', 'trialing'].includes(subscription.status)) {
+    planName = subscription.items[0]?.price?.product_name
   }
 
   return {
@@ -195,15 +195,6 @@ async function fetchUserPlan (apiKey, apiEndpoint) {
     teamName: teamDetails.name
   }
 }
-
-// Monitor API requests (optional - for debugging)
-// Note: Requires webRequest permission in manifest.json if you want to enable this
-// chrome.webRequest?.onBeforeRequest.addListener(
-//   function(details) {
-//     console.log('Stixify API request:', details.url);
-//   },
-//   { urls: ["*://api.stixify.com/*", "*://stixify.com/*"] }
-// );
 
 // Background job refresh functionality
 let jobRefreshInterval = null

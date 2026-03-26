@@ -7,17 +7,6 @@
 
     <form @submit.prevent="handleSubmit">
       <div class="form-group">
-        <label for="mode">Mode *</label>
-        <select id="mode" v-model="formData.mode" @change="checkAIMode" required>
-          <option value="standard">Basic</option>
-          <option value="ai">AI</option>
-        </select>
-        <div v-if="showAIWarning" class="help-text" style="color: #ff9800;">
-          AI mode requires a premium plan
-        </div>
-      </div>
-
-      <div class="form-group">
         <label for="reportName">Report Name *</label>
         <input type="text" id="reportName" v-model="formData.reportName" placeholder="Enter report name" required>
       </div>
@@ -87,7 +76,6 @@ export default {
   data() {
     return {
       formData: {
-        mode: 'standard',
         reportName: '',
         labels: '',
         aiDefinesConfidence: true,
@@ -95,8 +83,7 @@ export default {
         tlpLevel: 'clear',
         sources: []
       },
-      isSubmitting: false,
-      showAIWarning: false
+      isSubmitting: false
     };
   },
   mounted() {
@@ -112,14 +99,6 @@ export default {
       if (this.currentPageUrl) {
         this.formData.sources.push(this.currentPageUrl);
       }
-
-      this.checkAIMode();
-    },
-
-    checkAIMode() {
-      this.showAIWarning = this.formData.mode === 'ai' &&
-        this.userPlan &&
-        !this.userPlan.hasAIAccess;
     },
 
     addSource() {
@@ -138,7 +117,6 @@ export default {
         const mhtmlBlob = await this.capturePageAsMhtml();
 
         const submitData = {
-          extraction_mode: this.formData.mode,
           reportName: this.formData.reportName,
           labels: this.formData.labels
             .split(',')
@@ -209,7 +187,7 @@ export default {
 
       const formDataPayload = new FormData();
       formDataPayload.append('file', mhtmlBlob, this.slugify(formData.reportName) + '.mhtml');
-      formDataPayload.append('extraction_mode', formData.extraction_mode);
+      formDataPayload.append('extraction_mode', 'standard');
       formDataPayload.append('name', formData.reportName);
       if (formData.confidence !== null) {
         formDataPayload.append('confidence', formData.confidence);
