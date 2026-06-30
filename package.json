@@ -7,9 +7,9 @@
     "icons": "node scripts/generate-icons.js"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.0.4",
+    "@vitejs/plugin-vue": "^6.0.7",
     "sharp": "^0.33.5",
-    "vite": "^5.1.4"
+    "vite": "^8.1.0"
   },
   "dependencies": {
     "vue": "^3.4.21"
