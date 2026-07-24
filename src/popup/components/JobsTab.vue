@@ -44,6 +44,8 @@
         </tbody>
       </table>
     </div>
+
+    <button @click="openAllUploads" class="view-all-uploads">View all uploads</button>
   </div>
 </template>
 
@@ -93,6 +95,12 @@ export default {
       const baseUrl = (apiEndpoint).replace('api.', 'app.');
       const jobUrl = `${baseUrl}/${teamId}/${job.report_id}/uploads/${job.id}`;
       chrome.tabs.create({ url: jobUrl });
+    },
+
+    async openAllUploads() {
+      const { apiEndpoint, teamId } = await chrome.storage.sync.get(['apiEndpoint', 'teamId']);
+      const baseUrl = (apiEndpoint).replace('api.', 'app.');
+      chrome.tabs.create({ url: `${baseUrl}/${teamId}/uploads` });
     }
   }
 };

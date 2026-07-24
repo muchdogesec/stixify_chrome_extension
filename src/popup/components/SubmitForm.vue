@@ -226,7 +226,7 @@ export default {
     async saveJob(job) {
       const { jobs = [] } = await chrome.storage.local.get(['jobs']);
       jobs.unshift(job);
-      const trimmedJobs = jobs.slice(0, 100);
+      const trimmedJobs = jobs.slice(0, 10);
       await chrome.storage.local.set({ jobs: trimmedJobs });
     }
   }
