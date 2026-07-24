@@ -16,7 +16,7 @@
             :disabled="!endpointUnlocked">
           <button type="button" class="icon-btn" :title="endpointUnlocked ? 'Lock endpoint' : 'Edit endpoint'"
             @click="toggleEndpoint">
-            {{ endpointUnlocked ? '🔓' : '🔒' }}
+            <Icon :name="endpointUnlocked ? 'unlock' : 'lock'" :size="16" />
           </button>
         </div>
         <div class="help-text">Default endpoint should work for most users</div>
@@ -34,8 +34,11 @@
 </template>
 
 <script>
+import Icon from '@/components/Icon.vue';
+
 export default {
   name: 'OptionsApp',
+  components: { Icon },
   data() {
     return {
       formData: {
@@ -194,6 +197,9 @@ input:disabled {
   font-size: 16px;
   transition: all 0.3s;
   min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .icon-btn:hover {

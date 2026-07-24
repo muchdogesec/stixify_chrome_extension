@@ -12,14 +12,17 @@
     <QuotaExceededState v-if="currentState === 'quotaExceeded'" />
 
     <SubmitForm v-if="currentState === 'form' && activeTab === 'submit'" :user-plan="userPlan"
-      :current-page-url="currentPageUrl" @submit-success="handleSubmitSuccess" @submit-error="handleSubmitError" />
+      :current-page-url="currentPageUrl" @submit-success="handleSubmitSuccess" @submit-error="handleSubmitError"
+      @submitting-change="value => formSubmitting = value" />
 
     <SuccessState v-if="currentState === 'success' && activeTab === 'submit'" @submit-another="resetToForm" />
 
     <ErrorState v-if="currentState === 'error' && activeTab === 'submit'" :error-message="errorMessage"
       @retry="resetToForm" />
 
-    <JobsTab v-if="activeTab === 'jobs'" :jobs="jobs" @refresh-jobs="loadJobs" />
+    <JobsTab v-if="activeTab === 'jobs'" :jobs="jobs" @refresh-jobs="handleManualRefresh" />
+
+    <FloatingLoader :status="floatingStatus" :title="floatingTitle" />
   </div>
 </template>
 
@@ -33,6 +36,7 @@ import SubmitForm from './components/SubmitForm.vue';
 import SuccessState from './components/SuccessState.vue';
 import ErrorState from './components/ErrorState.vue';
 import JobsTab from './components/JobsTab.vue';
+import FloatingLoader from './components/FloatingLoader.vue';
 
 export default {
   name: 'App',
@@ -45,7 +49,8 @@ export default {
     SubmitForm,
     SuccessState,
     ErrorState,
-    JobsTab
+    JobsTab,
+    FloatingLoader
   },
   data() {
     return {
@@ -55,7 +60,11 @@ export default {
       userPlan: null,
       currentPageUrl: '',
       errorMessage: '',
-      jobs: []
+      jobs: [],
+      jobsLoading: false,
+      backgroundRefreshing: false,
+      formSubmitting: false,
+      hasRefreshError: false
     };
   },
   computed: {
@@ -63,6 +72,22 @@ export default {
       return this.jobs.filter(job =>
         job.state !== 'completed' && job.state !== 'failed'
       ).length;
+    },
+    isBusy() {
+      return this.currentState === 'loading' ||
+        this.jobsLoading ||
+        this.backgroundRefreshing ||
+        this.formSubmitting;
+    },
+    floatingStatus() {
+      if (this.isBusy) return 'loading';
+      if (this.hasRefreshError) return 'error';
+      return null;
+    },
+    floatingTitle() {
+      if (this.isBusy) return 'Loading...';
+      if (this.hasRefreshError) return 'Some jobs failed to refresh from Stixify';
+      return '';
     }
   },
   mounted() {
@@ -71,6 +96,12 @@ export default {
     chrome.runtime.onMessage.addListener((request) => {
       if (request.action === 'jobsUpdated') {
         this.loadJobs();
+      }
+      if (request.action === 'jobsRefreshing') {
+        this.backgroundRefreshing = request.isRefreshing;
+      }
+      if (request.action === 'jobsRefreshError') {
+        this.hasRefreshError = request.hasError;
       }
     });
   },
@@ -121,8 +152,16 @@ export default {
     },
 
     async loadJobs() {
+      this.jobsLoading = true;
       const { jobs = [] } = await chrome.storage.local.get(['jobs']);
       this.jobs = jobs;
+      this.jobsLoading = false;
+    },
+
+    async handleManualRefresh() {
+      this.jobsLoading = true;
+      await chrome.runtime.sendMessage({ action: 'refreshJobsNow' }).catch(() => {});
+      await this.loadJobs();
     },
 
     openSettings() {
