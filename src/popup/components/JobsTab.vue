@@ -2,7 +2,9 @@
   <div class="tab-content">
     <div class="jobs-header">
       <h2>Processing Jobs</h2>
-      <button @click="$emit('refresh-jobs')" class="icon-btn" title="Refresh">🔄</button>
+      <button @click="$emit('refresh-jobs')" class="icon-btn" title="Refresh">
+        <Icon name="refresh" :size="18" />
+      </button>
     </div>
 
     <div v-if="jobs.length === 0" class="empty-state">
@@ -46,8 +48,11 @@
 </template>
 
 <script>
+import Icon from '@/components/Icon.vue';
+
 export default {
   name: 'JobsTab',
+  components: { Icon },
   props: {
     jobs: {
       type: Array,

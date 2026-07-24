@@ -34,7 +34,8 @@
     "storage",
     "tabs",
     "pageCapture",
-    "scripting"
+    "scripting",
+    "alarms"
   ],
   "host_permissions": [
     "https://*/*",

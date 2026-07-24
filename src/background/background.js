@@ -1,5 +1,7 @@
 // Background service worker for Stixify extension
 
+const NEVER_RETRY_STATES = ['completed', 'failed', 'unknown']
+
 // Listen for extension installation
 chrome.runtime.onInstalled.addListener(function (details) {
   if (details.reason === 'install') {
@@ -197,29 +199,28 @@ async function fetchUserPlan (apiKey, apiEndpoint) {
 }
 
 // Background job refresh functionality
-let jobRefreshInterval = null
+// Uses chrome.alarms rather than setInterval because MV3 service workers can be
+// suspended by the browser after ~30s idle, silently killing any setInterval timer.
+// Alarms survive worker suspension/restart, at the cost of a 1-minute minimum period.
+const JOB_REFRESH_ALARM = 'stixify-job-refresh'
+
+chrome.alarms.onAlarm.addListener(alarm => {
+  if (alarm.name === JOB_REFRESH_ALARM) {
+    refreshIncompleteJobs()
+  }
+})
 
 // Start background job refresh
 function startJobRefresh () {
-  if (jobRefreshInterval) {
-    clearInterval(jobRefreshInterval)
-  }
-
   // Refresh immediately on start
   refreshIncompleteJobs()
 
-  // Then refresh every 10 seconds
-  jobRefreshInterval = setInterval(async () => {
-    await refreshIncompleteJobs()
-  }, 10000)
+  chrome.alarms.create(JOB_REFRESH_ALARM, { periodInMinutes: 1 })
 }
 
 // Stop background refresh
 function stopJobRefresh () {
-  if (jobRefreshInterval) {
-    clearInterval(jobRefreshInterval)
-    jobRefreshInterval = null
-  }
+  chrome.alarms.clear(JOB_REFRESH_ALARM)
 }
 
 // Refresh incomplete jobs from API
@@ -230,7 +231,8 @@ async function refreshIncompleteJobs () {
 
     const { jobs = [] } = await chrome.storage.local.get(['jobs'])
     const incompleteJobs = jobs.filter(
-      job => job.state !== 'completed' && job.state !== 'failed'
+      job =>
+        !NEVER_RETRY_STATES.includes(job.state)
     )
 
     if (incompleteJobs.length === 0) {
@@ -238,7 +240,10 @@ async function refreshIncompleteJobs () {
       return
     }
 
+    notifyPopupOfRefreshState(true)
+
     let hasUpdates = false
+    let hasError = false
 
     for (const job of incompleteJobs) {
       try {
@@ -251,8 +256,16 @@ async function refreshIncompleteJobs () {
         hasUpdates = true
       } catch (error) {
         console.error('Failed to refresh job:', job.id, error)
+        if (error.status === 404) {
+          await updateJob(job.id, { state: 'unknown' })
+          hasUpdates = true
+        } else {
+          hasError = true
+        }
       }
     }
+
+    notifyPopupOfRefreshError(hasError)
 
     // Notify popup if there are updates
     if (hasUpdates) {
@@ -260,6 +273,9 @@ async function refreshIncompleteJobs () {
     }
   } catch (error) {
     console.error('Error in refreshIncompleteJobs:', error)
+    notifyPopupOfRefreshError(true)
+  } finally {
+    notifyPopupOfRefreshState(false)
   }
 }
 
@@ -278,7 +294,9 @@ async function fetchJobStatus (jobId, apiKey, apiEndpoint) {
   })
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch job status: ${response.status}`)
+    const error = new Error(`Failed to fetch job status: ${response.status}`)
+    error.status = response.status
+    throw error
   }
 
   const job = await response.json()
@@ -304,6 +322,20 @@ async function updateJob (jobId, updates) {
 // Notify popup of job updates
 function notifyPopupOfJobUpdates () {
   chrome.runtime.sendMessage({ action: 'jobsUpdated' }).catch(() => {
+    // Popup might not be open, ignore error
+  })
+}
+
+// Notify popup that a background job refresh is in progress/finished
+function notifyPopupOfRefreshState (isRefreshing) {
+  chrome.runtime.sendMessage({ action: 'jobsRefreshing', isRefreshing }).catch(() => {
+    // Popup might not be open, ignore error
+  })
+}
+
+// Notify popup whether the last refresh cycle hit a non-404 error (network/API issue)
+function notifyPopupOfRefreshError (hasError) {
+  chrome.runtime.sendMessage({ action: 'jobsRefreshError', hasError }).catch(() => {
     // Popup might not be open, ignore error
   })
 }

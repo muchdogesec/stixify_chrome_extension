@@ -53,6 +53,9 @@ body {
   padding: 4px 8px;
   border-radius: 4px;
   transition: background-color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .icon-btn:hover {
@@ -249,6 +252,9 @@ select:focus {
   border-radius: 4px;
   cursor: pointer;
   font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .source-item button:hover {
@@ -354,6 +360,13 @@ select:focus {
   margin: 0 0 10px 0;
 }
 
+.state-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
 .warning .help-text,
 .error .help-text,
 .success .help-text {
@@ -456,6 +469,11 @@ select:focus {
   color: #721c24;
 }
 
+.job-state.unknown {
+  background-color: #e2e3e5;
+  color: #383d41;
+}
+
 .job-time {
   color: #666;
   font-size: 11px;
@@ -465,4 +483,39 @@ select:focus {
 .job-time.pending {
   color: #999;
   font-style: italic;
+}
+
+/* Floating Loader */
+.floating-loader {
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+}
+
+.floating-loader.loading .floating-loader-icon {
+  animation: spin 1s linear infinite;
+}
+
+.floating-loader.error {
+  background-color: #f44336;
+}
+
+.floating-loader-fade-enter-active,
+.floating-loader-fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.floating-loader-fade-enter-from,
+.floating-loader-fade-leave-to {
+  opacity: 0;
 }

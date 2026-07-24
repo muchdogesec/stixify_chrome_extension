@@ -43,7 +43,9 @@
         <div class="sources-list">
           <div v-for="(source, index) in formData.sources" :key="index" class="source-item">
             <input type="text" v-model="formData.sources[index]" placeholder="https://example.com" class="source-input">
-            <button type="button" @click="removeSource(index)">✕</button>
+            <button type="button" @click="removeSource(index)" title="Remove source">
+              <Icon name="x" :size="12" :stroke-width="2.5" />
+            </button>
           </div>
         </div>
         <button type="button" @click="addSource" class="btn btn-small">+ Add Source</button>
@@ -60,8 +62,11 @@
 </template>
 
 <script>
+import Icon from '@/components/Icon.vue';
+
 export default {
   name: 'SubmitForm',
+  components: { Icon },
   props: {
     userPlan: {
       type: Object,
@@ -72,7 +77,7 @@ export default {
       default: ''
     }
   },
-  emits: ['submit-success', 'submit-error'],
+  emits: ['submit-success', 'submit-error', 'submitting-change'],
   data() {
     return {
       formData: {
@@ -111,6 +116,7 @@ export default {
 
     async handleSubmit() {
       this.isSubmitting = true;
+      this.$emit('submitting-change', true);
 
       try {
         const settings = await chrome.storage.sync.get(['apiKey', 'apiEndpoint', 'teamId']);
@@ -158,6 +164,7 @@ export default {
         this.$emit('submit-error', error.message);
       } finally {
         this.isSubmitting = false;
+        this.$emit('submitting-change', false);
       }
     },
 
