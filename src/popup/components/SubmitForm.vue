@@ -17,14 +17,49 @@
         <div class="help-text">e.g., malware, threat-intel, analysis</div>
       </div>
 
-      <div class="form-group">
-        <label for="confidence">Confidence</label>
-        <div class="checkbox-row">
-          <input type="checkbox" id="aiDefinesConfidence" v-model="formData.aiDefinesConfidence">
-          <label for="aiDefinesConfidence" class="checkbox-label">Let AI define confidence</label>
+      <div class="confidence-section">
+        <h3 class="section-title">Confidence</h3>
+
+        <div class="form-group">
+          <div class="checkbox-row">
+            <input type="checkbox" id="aiDefinesConfidence" v-model="formData.aiDefinesConfidence">
+            <label for="aiDefinesConfidence" class="checkbox-label">Let AI define confidence</label>
+          </div>
+          <input v-if="!formData.aiDefinesConfidence" type="number" id="confidence" v-model.number="formData.confidence" min="0" max="100" required>
+          <div v-if="!formData.aiDefinesConfidence" class="help-text">0-100</div>
         </div>
-        <input v-if="!formData.aiDefinesConfidence" type="number" id="confidence" v-model.number="formData.confidence" min="0" max="100" required>
-        <div v-if="!formData.aiDefinesConfidence" class="help-text">0-100</div>
+
+        <div class="form-group">
+          <label for="admiraltySourceReliability">
+            Admiralty Source Reliability
+            <a href="https://en.wikipedia.org/wiki/Admiralty_code#Reliability" target="_blank" rel="noopener" class="help-link" title="Learn more about Admiralty Code">?</a>
+          </label>
+          <select id="admiraltySourceReliability" v-model="formData.admiraltySourceReliability">
+            <option value="">None</option>
+            <option value="A">A - Completely reliable</option>
+            <option value="B">B - Usually reliable</option>
+            <option value="C">C - Fairly reliable</option>
+            <option value="D">D - Not usually reliable</option>
+            <option value="E">E - Unreliable</option>
+            <option value="F">F - Reliability cannot be judged</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="admiraltyInformationCredibility">
+            Admiralty Information Credibility
+            <a href="https://en.wikipedia.org/wiki/Admiralty_code#Credibility" target="_blank" rel="noopener" class="help-link" title="Learn more about Admiralty Code">?</a>
+          </label>
+          <select id="admiraltyInformationCredibility" v-model="formData.admiraltyInformationCredibility">
+            <option value="">None</option>
+            <option value="1">1 - Confirmed by other sources</option>
+            <option value="2">2 - Probably true</option>
+            <option value="3">3 - Possibly true</option>
+            <option value="4">4 - Doubtful</option>
+            <option value="5">5 - Improbable</option>
+            <option value="6">6 - Truth cannot be judged</option>
+          </select>
+        </div>
       </div>
 
       <div class="form-group">
@@ -86,6 +121,8 @@ export default {
         aiDefinesConfidence: true,
         confidence: 50,
         tlpLevel: 'clear',
+        admiraltySourceReliability: '',
+        admiraltyInformationCredibility: '',
         sources: []
       },
       isSubmitting: false
@@ -130,6 +167,8 @@ export default {
             .filter(l => l).join(','),
           confidence: this.formData.aiDefinesConfidence ? null : this.formData.confidence,
           tlpLevel: this.formData.tlpLevel,
+          admiraltySourceReliability: this.formData.admiraltySourceReliability || null,
+          admiraltyInformationCredibility: this.formData.admiraltyInformationCredibility || null,
           sources: this.formData.sources.filter(url => url.trim())
         };
 
@@ -200,6 +239,12 @@ export default {
         formDataPayload.append('confidence', formData.confidence);
       }
       formDataPayload.append('tlp_level', formData.tlpLevel);
+      if (formData.admiraltySourceReliability) {
+        formDataPayload.append('admiralty_source_reliability', formData.admiraltySourceReliability);
+      }
+      if (formData.admiraltyInformationCredibility) {
+        formDataPayload.append('admiralty_information_credibility', formData.admiraltyInformationCredibility);
+      }
 
       if (formData.labels.length > 0) {
         formDataPayload.append('labels', JSON.stringify(formData.labels));
