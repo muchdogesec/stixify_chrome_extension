@@ -485,6 +485,25 @@ select:focus {
   font-style: italic;
 }
 
+.view-all-uploads {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 8px;
+  background: none;
+  border: none;
+  color: #2196F3;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  font-family: inherit;
+}
+
+.view-all-uploads:hover {
+  text-decoration: underline;
+}
+
 /* Floating Loader */
 .floating-loader {
   position: fixed;
