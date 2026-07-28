@@ -177,12 +177,57 @@ body {
   margin-bottom: 16px;
 }
 
+.confidence-section {
+  border: 1px solid #d7e6fd;
+  background-color: #f4f8ff;
+  border-left: 3px solid #2196F3;
+  border-radius: 4px;
+  padding: 14px 14px 2px;
+  margin-bottom: 16px;
+}
+
+.confidence-section .form-group:last-child {
+  margin-bottom: 14px;
+}
+
+.section-title {
+  margin: 0 0 12px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1565c0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 label {
   display: block;
   margin-bottom: 6px;
   font-weight: 500;
   font-size: 13px;
   color: #333;
+}
+
+.help-link {
+  display: inline-block;
+  margin-left: 4px;
+  width: 14px;
+  height: 14px;
+  line-height: 14px;
+  text-align: center;
+  background-color: #e3f2fd;
+  border-radius: 50%;
+  color: #2196F3;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+  vertical-align: super;
+}
+
+.help-link:hover {
+  background-color: #2196F3;
+  color: #fff;
 }
 
 input[type="text"],
@@ -217,9 +262,44 @@ select:focus {
 }
 
 .checkbox-row input[type="checkbox"] {
-  width: auto;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
   margin: 0;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  background-color: #fff;
   cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.checkbox-row input[type="checkbox"]:hover {
+  border-color: #4CAF50;
+}
+
+.checkbox-row input[type="checkbox"]:focus-visible {
+  outline: 2px solid #4CAF50;
+  outline-offset: 1px;
+}
+
+.checkbox-row input[type="checkbox"]:checked {
+  background-color: #4CAF50;
+  border-color: #4CAF50;
+}
+
+.checkbox-row input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
 .checkbox-label {
