@@ -28,12 +28,16 @@
           <input v-if="!formData.aiDefinesConfidence" type="number" id="confidence" v-model.number="formData.confidence" min="0" max="100" required>
           <div v-if="!formData.aiDefinesConfidence" class="help-text">0-100</div>
         </div>
+      </div>
+
+      <div class="admiralty-section">
+        <h3 class="section-title">
+          Admiralty Code
+          <a href="https://en.wikipedia.org/wiki/Admiralty_code" target="_blank" rel="noopener" class="help-link" title="Learn more about Admiralty Code">?</a>
+        </h3>
 
         <div class="form-group">
-          <label for="admiraltySourceReliability">
-            Admiralty Source Reliability
-            <a href="https://en.wikipedia.org/wiki/Admiralty_code#Reliability" target="_blank" rel="noopener" class="help-link" title="Learn more about Admiralty Code">?</a>
-          </label>
+          <label for="admiraltySourceReliability">Source Reliability</label>
           <select id="admiraltySourceReliability" v-model="formData.admiraltySourceReliability">
             <option value="">None</option>
             <option value="A">A - Completely reliable</option>
@@ -46,10 +50,7 @@
         </div>
 
         <div class="form-group">
-          <label for="admiraltyInformationCredibility">
-            Admiralty Information Credibility
-            <a href="https://en.wikipedia.org/wiki/Admiralty_code#Credibility" target="_blank" rel="noopener" class="help-link" title="Learn more about Admiralty Code">?</a>
-          </label>
+          <label for="admiraltyInformationCredibility">Information Credibility</label>
           <select id="admiraltyInformationCredibility" v-model="formData.admiraltyInformationCredibility">
             <option value="">None</option>
             <option value="1">1 - Confirmed by other sources</option>
