@@ -17,6 +17,12 @@
         <div class="help-text">e.g., malware, threat-intel, analysis</div>
       </div>
 
+      <div class="form-group">
+        <label for="publishedDate">Published Date</label>
+        <input type="date" id="publishedDate" v-model="formData.publishedDate">
+        <div class="help-text">Optional — when this report was published</div>
+      </div>
+
       <div class="confidence-section">
         <h3 class="section-title">Confidence</h3>
 
@@ -119,6 +125,7 @@ export default {
       formData: {
         reportName: '',
         labels: '',
+        publishedDate: '',
         aiDefinesConfidence: true,
         confidence: 50,
         tlpLevel: 'clear',
@@ -166,6 +173,7 @@ export default {
             .split(',')
             .map(l => l.trim())
             .filter(l => l).join(','),
+          publishedDate: this.formData.publishedDate ? new Date(this.formData.publishedDate + 'T00:00:00Z').toISOString() : null,
           confidence: this.formData.aiDefinesConfidence ? null : this.formData.confidence,
           tlpLevel: this.formData.tlpLevel,
           admiraltySourceReliability: this.formData.admiraltySourceReliability || null,
@@ -240,6 +248,9 @@ export default {
         formDataPayload.append('confidence', formData.confidence);
       }
       formDataPayload.append('tlp_level', formData.tlpLevel);
+      if (formData.publishedDate) {
+        formDataPayload.append('created', formData.publishedDate);
+      }
       if (formData.admiraltySourceReliability) {
         formDataPayload.append('admiralty_source_reliability', formData.admiraltySourceReliability);
       }
