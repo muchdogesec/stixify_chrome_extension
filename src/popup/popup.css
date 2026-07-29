@@ -252,20 +252,36 @@ label {
 
 input[type="text"],
 input[type="number"],
+input[type="date"],
 select {
   width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
   font-size: 14px;
   box-sizing: border-box;
   font-family: inherit;
+  background-color: #fafafa;
+  transition: all 0.2s ease;
 }
 
-input:focus,
+input[type="text"]:hover,
+input[type="number"]:hover,
+input[type="date"]:hover,
+select:hover {
+  border-color: #4CAF50;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
 select:focus {
   outline: none;
   border-color: #4CAF50;
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
 }
 
 .help-text {
