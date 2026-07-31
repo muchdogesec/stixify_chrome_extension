@@ -69,8 +69,29 @@
         </div>
       </div>
 
+      <div class="pap-section">
+        <h3 class="section-title">
+          PAP Level
+          <a href="https://www.misp-project.org/taxonomies.html#_pap" target="_blank" rel="noopener" class="help-link" title="Learn more about PAP">?</a>
+        </h3>
+
+        <div class="form-group">
+          <label for="papLevel">Permissible Actions Protocol</label>
+          <select id="papLevel" v-model="formData.papLevel">
+            <option value="">None</option>
+            <option value="red">PAP:RED</option>
+            <option value="amber">PAP:AMBER</option>
+            <option value="green">PAP:GREEN</option>
+            <option value="clear">PAP:CLEAR</option>
+          </select>
+        </div>
+      </div>
+
       <div class="form-group">
-        <label for="tlpLevel">TLP Level *</label>
+        <label for="tlpLevel">
+          TLP Level *
+          <a href="https://en.wikipedia.org/wiki/Traffic_light_protocol" target="_blank" rel="noopener" class="help-link" title="Learn more about TLP">?</a>
+        </label>
         <select id="tlpLevel" v-model="formData.tlpLevel" required>
           <option value="red">TLP:RED</option>
           <option value="amber+strict">TLP:AMBER+STRICT</option>
@@ -129,6 +150,7 @@ export default {
         aiDefinesConfidence: true,
         confidence: 50,
         tlpLevel: 'clear',
+        papLevel: '',
         admiraltySourceReliability: '',
         admiraltyInformationCredibility: '',
         sources: []
@@ -176,6 +198,7 @@ export default {
           publishedDate: this.formData.publishedDate ? new Date(this.formData.publishedDate + 'T00:00:00Z').toISOString() : null,
           confidence: this.formData.aiDefinesConfidence ? null : this.formData.confidence,
           tlpLevel: this.formData.tlpLevel,
+          papLevel: this.formData.papLevel || null,
           admiraltySourceReliability: this.formData.admiraltySourceReliability || null,
           admiraltyInformationCredibility: this.formData.admiraltyInformationCredibility || null,
           sources: this.formData.sources.filter(url => url.trim())
@@ -248,6 +271,9 @@ export default {
         formDataPayload.append('confidence', formData.confidence);
       }
       formDataPayload.append('tlp_level', formData.tlpLevel);
+      if (formData.papLevel) {
+        formDataPayload.append('pap_level', formData.papLevel);
+      }
       if (formData.publishedDate) {
         formDataPayload.append('created', formData.publishedDate);
       }
