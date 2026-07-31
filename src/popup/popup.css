@@ -219,6 +219,23 @@ body {
   color: #e65100;
 }
 
+.pap-section {
+  border: 1px solid #d1c4e9;
+  background-color: #f3e5f5;
+  border-left: 3px solid #7c3aed;
+  border-radius: 4px;
+  padding: 14px 14px 2px;
+  margin-bottom: 16px;
+}
+
+.pap-section .form-group:last-child {
+  margin-bottom: 14px;
+}
+
+.pap-section .section-title {
+  color: #6b21a8;
+}
+
 label {
   display: block;
   margin-bottom: 6px;
