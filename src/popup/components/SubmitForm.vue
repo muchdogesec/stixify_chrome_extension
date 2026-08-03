@@ -43,10 +43,10 @@
 
         <div class="form-group">
           <div class="checkbox-row">
-            <input type="checkbox" id="aiDefinesConfidence" v-model="formData.aiDefinesConfidence">
+            <input type="checkbox" id="aiDefinesConfidence" v-model="formData.aiDefinesConfidence" >
             <label for="aiDefinesConfidence" class="checkbox-label">Let AI define confidence</label>
           </div>
-          <input v-if="!formData.aiDefinesConfidence" type="number" id="confidence" v-model.number="formData.confidence" min="0" max="100" required>
+          <input v-if="!formData.aiDefinesConfidence" type="number" id="confidence" v-model.number="formData.confidence" @blur="saveFormData" min="0" max="100" required>
           <div v-if="!formData.aiDefinesConfidence" class="help-text">0-100</div>
         </div>
       </div>
@@ -59,7 +59,7 @@
 
         <div class="form-group">
           <label for="admiraltySourceReliability">Source Reliability</label>
-          <select id="admiraltySourceReliability" v-model="formData.admiraltySourceReliability">
+          <select id="admiraltySourceReliability" v-model="formData.admiraltySourceReliability" >
             <option value="">None</option>
             <option value="A">A - Completely reliable</option>
             <option value="B">B - Usually reliable</option>
@@ -72,7 +72,7 @@
 
         <div class="form-group">
           <label for="admiraltyInformationCredibility">Information Credibility</label>
-          <select id="admiraltyInformationCredibility" v-model="formData.admiraltyInformationCredibility">
+          <select id="admiraltyInformationCredibility" v-model="formData.admiraltyInformationCredibility" >
             <option value="">None</option>
             <option value="1">1 - Confirmed by other sources</option>
             <option value="2">2 - Probably true</option>
@@ -92,7 +92,7 @@
 
         <div class="form-group">
           <label for="papLevel">Permissible Actions Protocol</label>
-          <select id="papLevel" v-model="formData.papLevel">
+          <select id="papLevel" v-model="formData.papLevel" >
             <option value="">None</option>
             <option value="red">PAP:RED</option>
             <option value="amber">PAP:AMBER</option>
@@ -107,7 +107,7 @@
           TLP Level *
           <a href="https://en.wikipedia.org/wiki/Traffic_light_protocol" target="_blank" rel="noopener" class="help-link" title="Learn more about TLP">?</a>
         </label>
-        <select id="tlpLevel" v-model="formData.tlpLevel" required>
+        <select id="tlpLevel" v-model="formData.tlpLevel"  required>
           <option value="red">TLP:RED</option>
           <option value="amber+strict">TLP:AMBER+STRICT</option>
           <option value="amber">TLP:AMBER</option>
@@ -172,20 +172,71 @@ export default {
         sources: []
       },
       isSubmitting: false,
-      lastDeleteKeyPressTime: 0
+      lastDeleteKeyPressTime: 0,
+      saveTimeout: null
     };
+  },
+  watch: {
+    formData: {
+      handler() {
+        if (this.saveTimeout) clearTimeout(this.saveTimeout);
+        this.saveTimeout = setTimeout(() => this.saveFormData(), 500);
+      },
+      deep: true
+    }
   },
   mounted() {
     this.initializeForm();
   },
   methods: {
+    async saveFormData() {
+      const dataToSave = {
+        pageUrl: this.currentPageUrl,
+        reportName: this.formData.reportName,
+        labelTags: this.formData.labelTags.join(','),
+        labelsInput: this.formData.labelsInput,
+        publishedDate: this.formData.publishedDate,
+        aiDefinesConfidence: this.formData.aiDefinesConfidence,
+        confidence: this.formData.confidence,
+        tlpLevel: this.formData.tlpLevel,
+        papLevel: this.formData.papLevel,
+        admiraltySourceReliability: this.formData.admiraltySourceReliability,
+        admiraltyInformationCredibility: this.formData.admiraltyInformationCredibility,
+        sources: this.formData.sources.join(',')
+      };
+      await chrome.storage.session.set({ submitFormData: dataToSave });
+    },
+
+    async loadFormData() {
+      const result = await chrome.storage.session.get(['submitFormData']);
+      if (result.submitFormData) {
+        const saved = result.submitFormData;
+        if (saved.pageUrl !== this.currentPageUrl) {
+          await chrome.storage.session.remove(['submitFormData']);
+          return;
+        }
+        this.formData.reportName = saved.reportName || '';
+        this.formData.labelTags = saved.labelTags ? saved.labelTags.split(',') : [];
+        this.formData.labelsInput = saved.labelsInput || '';
+        this.formData.publishedDate = saved.publishedDate || '';
+        this.formData.aiDefinesConfidence = saved.aiDefinesConfidence !== undefined ? saved.aiDefinesConfidence : true;
+        this.formData.confidence = saved.confidence || 50;
+        this.formData.tlpLevel = saved.tlpLevel || 'clear';
+        this.formData.papLevel = saved.papLevel || '';
+        this.formData.admiraltySourceReliability = saved.admiraltySourceReliability || '';
+        this.formData.admiraltyInformationCredibility = saved.admiraltyInformationCredibility || '';
+        this.formData.sources = saved.sources ? saved.sources.split(',') : [];
+      }
+    },
     async initializeForm() {
+      await this.loadFormData();
+
       const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-      if (tabs[0] && tabs[0].title) {
+      if (tabs[0] && tabs[0].title && !this.formData.reportName) {
         this.formData.reportName = tabs[0].title;
       }
 
-      if (this.currentPageUrl) {
+      if (this.currentPageUrl && !this.formData.sources.includes(this.currentPageUrl)) {
         this.formData.sources.push(this.currentPageUrl);
       }
     },
@@ -266,11 +317,13 @@ export default {
             job_url: jobUrl
           });
 
+          await chrome.storage.session.remove(['submitFormData']);
           this.$emit('submit-success');
         } else {
           throw new Error('Invalid response from Stixify API: Missing job ID');
         }
       } catch (error) {
+        await this.saveFormData();
         this.$emit('submit-error', error.message);
       } finally {
         this.isSubmitting = false;
