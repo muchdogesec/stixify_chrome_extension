@@ -13,7 +13,22 @@
 
       <div class="form-group">
         <label for="labels">Labels</label>
-        <input type="text" id="labels" v-model="formData.labels" placeholder="Comma-separated labels (optional)">
+        <div class="labels-container">
+          <div v-if="formData.labelTags.length > 0" class="label-tags">
+            <span v-for="(tag, index) in formData.labelTags" :key="index" class="label-tag">
+              {{ tag }}
+              <button type="button" @click="removeLabel(index)" class="tag-remove">×</button>
+            </span>
+          </div>
+          <input
+            type="text"
+            id="labels"
+            v-model="formData.labelsInput"
+            @keydown="handleLabelInput"
+            placeholder="Type labels (comma or space to add)"
+            class="labels-input"
+          >
+        </div>
         <div class="help-text">e.g., malware, threat-intel, analysis</div>
       </div>
 
@@ -145,7 +160,8 @@ export default {
     return {
       formData: {
         reportName: '',
-        labels: '',
+        labelTags: [],
+        labelsInput: '',
         publishedDate: '',
         aiDefinesConfidence: true,
         confidence: 50,
@@ -155,7 +171,8 @@ export default {
         admiraltyInformationCredibility: '',
         sources: []
       },
-      isSubmitting: false
+      isSubmitting: false,
+      lastDeleteKeyPressTime: 0
     };
   },
   mounted() {
@@ -181,6 +198,31 @@ export default {
       this.formData.sources.splice(index, 1);
     },
 
+    handleLabelInput(event) {
+      const value = this.formData.labelsInput;
+      if (event.key === ',' || event.key === ' ') {
+        event.preventDefault();
+        const label = value.trim();
+        if (label && !this.formData.labelTags.includes(label)) {
+          this.formData.labelTags.push(label);
+          this.formData.labelsInput = '';
+        }
+      } else if (event.key === 'Backspace' && value === '' && this.formData.labelTags.length > 0) {
+        const now = Date.now();
+        if (now - this.lastDeleteKeyPressTime < 500) {
+          event.preventDefault();
+          this.formData.labelTags.pop();
+          this.lastDeleteKeyPressTime = 0;
+        } else {
+          this.lastDeleteKeyPressTime = now;
+        }
+      }
+    },
+
+    removeLabel(index) {
+      this.formData.labelTags.splice(index, 1);
+    },
+
     async handleSubmit() {
       this.isSubmitting = true;
       this.$emit('submitting-change', true);
@@ -191,17 +233,14 @@ export default {
 
         const submitData = {
           reportName: this.formData.reportName,
-          labels: this.formData.labels
-            .split(',')
-            .map(l => l.trim())
-            .filter(l => l).join(','),
+          labels: this.formData.labelTags.join(','),
           publishedDate: this.formData.publishedDate ? new Date(this.formData.publishedDate + 'T00:00:00Z').toISOString() : null,
           confidence: this.formData.aiDefinesConfidence ? null : this.formData.confidence,
           tlpLevel: this.formData.tlpLevel,
           papLevel: this.formData.papLevel || null,
           admiraltySourceReliability: this.formData.admiraltySourceReliability || null,
           admiraltyInformationCredibility: this.formData.admiraltyInformationCredibility || null,
-          sources: this.formData.sources.filter(url => url.trim())
+          sources: this.formData.sources.filter(url => url.trim()).join(',')
         };
 
         const uploadTime = new Date().toISOString();
@@ -285,11 +324,11 @@ export default {
       }
 
       if (formData.labels.length > 0) {
-        formDataPayload.append('labels', JSON.stringify(formData.labels));
+        formDataPayload.append('labels', formData.labels);
       }
 
       if (formData.sources.length > 0) {
-        formDataPayload.append('sources', JSON.stringify(formData.sources));
+        formDataPayload.append('sources', formData.sources);
       }
 
       const response = await fetch(endpoint, {
