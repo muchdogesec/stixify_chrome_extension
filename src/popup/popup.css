@@ -394,6 +394,84 @@ select:focus {
   background-color: #da190b;
 }
 
+/* Labels Tags */
+.labels-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  padding: 6px 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background-color: #fafafa;
+  transition: all 0.2s ease;
+  min-height: 40px;
+}
+
+.labels-container:hover,
+.labels-container:focus-within {
+  border-color: #4CAF50;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.label-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.label-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(76, 175, 80, 0.2);
+}
+
+.tag-remove {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  transition: all 0.2s;
+}
+
+.tag-remove:hover {
+  transform: scale(1.2);
+  opacity: 0.9;
+}
+
+.labels-input {
+  flex: 1;
+  min-width: 80px;
+  padding: 6px 4px !important;
+  border: none !important;
+  background: transparent !important;
+  font-size: 14px;
+  height: auto;
+}
+
+.labels-input:focus {
+  outline: none;
+}
+
 /* Buttons */
 .btn {
   padding: 10px 16px;
