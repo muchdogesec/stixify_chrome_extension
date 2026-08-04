@@ -12,6 +12,49 @@
       </div>
 
       <div class="form-group">
+        <label for="dossierSearch">Dossiers</label>
+        <div class="dossier-selector" @click.self="closeDossierDropdown">
+          <div v-if="formData.dossierIds.length > 0" class="dossier-selected-list">
+            <div
+              v-for="dossierId in formData.dossierIds"
+              :key="dossierId"
+              class="dossier-chip"
+            >
+              <span>{{ dossiers.find(d => d.id === dossierId)?.name || dossierId }}</span>
+              <button type="button" @click="removeDossier(dossierId)" class="remove-chip">×</button>
+            </div>
+          </div>
+          <input
+            type="text"
+            id="dossierSearch"
+            v-model="dossierSearchInput"
+            placeholder="Search dossiers..."
+            class="dossier-input"
+            @focus="showDossierDropdown = true"
+            @mousedown="showDossierDropdown = !showDossierDropdown"
+            @input="showDossierDropdown = true"
+            @keydown.escape="closeDossierDropdown"
+            @blur="closeDossierDropdown"
+          >
+          <div v-if="showDossierDropdown" class="dossier-dropdown" @mousedown.prevent>
+            <div v-if="filteredDossiers.length === 0" class="dossier-item empty">
+              No dossiers found
+            </div>
+            <div
+              v-for="dossier in filteredDossiers"
+              :key="dossier.id"
+              class="dossier-item"
+              @mousedown="selectDossier(dossier)"
+            >
+              <div class="dossier-name">{{ dossier.name }}</div>
+              <div class="dossier-meta">{{ dossier.id }}</div>
+            </div>
+          </div>
+        </div>
+        <div class="help-text">Optional — associate this report with dossiers</div>
+      </div>
+
+      <div class="form-group">
         <label>Labels</label>
         <div class="labels-list">
           <div v-for="(label, index) in formData.labels" :key="index" class="label-item" :class="{ 'has-error': errors.labels[index] }">
@@ -191,6 +234,7 @@ export default {
     return {
       formData: {
         reportName: '',
+        dossierIds: [],
         labels: [],
         publishedDate: '',
         aiDefinesConfidence: true,
@@ -201,6 +245,9 @@ export default {
         admiraltyInformationCredibility: '',
         sources: []
       },
+      dossiers: [],
+      dossierSearchInput: '',
+      showDossierDropdown: false,
       errors: {
         labels: {},
         sources: {},
@@ -216,6 +263,19 @@ export default {
       const hasSourceErrors = Object.keys(this.errors.sources).length > 0;
       const hasDateError = this.errors.publishedDate !== '';
       return hasLabelErrors || hasSourceErrors || hasDateError;
+    },
+    filteredDossiers() {
+      const unselected = this.dossiers.filter(d => !this.formData.dossierIds.includes(d.id));
+
+      if (!this.dossierSearchInput.trim()) {
+        return unselected;
+      }
+
+      const search = this.dossierSearchInput.toLowerCase();
+      return unselected.filter(d => {
+        const searchIn = [d.id.toLowerCase(), d.name.toLowerCase(), d.label || ''].join(' ');
+        return this.fuzzyMatch(search, searchIn);
+      });
     }
   },
   watch: {
@@ -235,6 +295,7 @@ export default {
       const dataToSave = {
         pageUrl: this.currentPageUrl,
         reportName: this.formData.reportName,
+        dossierIds: this.formData.dossierIds.join(','),
         labels: this.formData.labels.join(','),
         publishedDate: this.formData.publishedDate,
         aiDefinesConfidence: this.formData.aiDefinesConfidence,
@@ -257,6 +318,7 @@ export default {
           return;
         }
         this.formData.reportName = saved.reportName || '';
+        this.formData.dossierIds = saved.dossierIds ? saved.dossierIds.split(',').filter(d => d.trim()) : [];
         this.formData.labels = saved.labels ? saved.labels.split(',').filter(l => l.trim()) : [];
         this.formData.publishedDate = saved.publishedDate || '';
         this.formData.aiDefinesConfidence = saved.aiDefinesConfidence !== undefined ? saved.aiDefinesConfidence : true;
@@ -273,6 +335,7 @@ export default {
     },
     async initializeForm() {
       await this.loadFormData();
+      await this.refreshDossiers();
 
       const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
       if (tabs[0] && tabs[0].title && !this.formData.reportName) {
@@ -282,6 +345,71 @@ export default {
       if (this.currentPageUrl && !this.formData.sources.includes(this.currentPageUrl)) {
         this.formData.sources.push(this.currentPageUrl);
       }
+    },
+
+    async refreshDossiers() {
+      try {
+        const settings = await chrome.storage.sync.get(['apiKey', 'apiEndpoint']);
+
+        if (!settings.apiKey) {
+          console.error('No API key configured');
+          return;
+        }
+
+        const response = await chrome.runtime.sendMessage({
+          action: 'fetchDossiers',
+          apiKey: settings.apiKey,
+          apiEndpoint: settings.apiEndpoint
+        });
+
+        if (!response || response.error) {
+          console.error('Failed to fetch dossiers:', response?.error || 'Unknown error');
+          return;
+        }
+
+        this.dossiers = response.dossiers || [];
+
+        await chrome.storage.local.set({
+          dossierCache: {
+            dossiers: this.dossiers,
+            latestCreatedAt: response.latestCreatedAt,
+            lastUpdated: new Date().toISOString()
+          }
+        });
+      } catch (error) {
+        console.error('Failed to refresh dossiers:', error);
+      }
+    },
+
+    selectDossier(dossier) {
+      if (!this.formData.dossierIds.includes(dossier.id)) {
+        this.formData.dossierIds.push(dossier.id);
+      }
+      this.dossierSearchInput = '';
+      this.saveFormData();
+      this.showDossierDropdown = false;
+    },
+
+    removeDossier(dossierId) {
+      const index = this.formData.dossierIds.indexOf(dossierId);
+      if (index > -1) {
+        this.formData.dossierIds.splice(index, 1);
+      }
+      this.saveFormData();
+    },
+
+    closeDossierDropdown() {
+      this.showDossierDropdown = false;
+    },
+
+    fuzzyMatch(search, text) {
+      let searchIdx = 0;
+      for (let i = 0; i < text.length && searchIdx < search.length; i++) {
+        if (text[i] === search[searchIdx]) {
+          searchIdx++;
+        }
+      }
+      return searchIdx === search.length;
     },
 
     addLabel() {
@@ -417,6 +545,7 @@ export default {
 
         const submitData = {
           reportName: this.formData.reportName,
+          dossierIds: this.formData.dossierIds.length > 0 ? this.formData.dossierIds : null,
           labels: this.formData.labels.filter(l => l.trim()).join(','),
           publishedDate: this.formData.publishedDate ? new Date(this.formData.publishedDate + 'T00:00:00Z').toISOString() : null,
           confidence: this.formData.aiDefinesConfidence ? null : this.formData.confidence,
@@ -492,6 +621,11 @@ export default {
       formDataPayload.append('file', mhtmlBlob, this.slugify(formData.reportName) + '.mhtml');
       formDataPayload.append('extraction_mode', 'standard');
       formDataPayload.append('name', formData.reportName);
+      if (formData.dossierIds && formData.dossierIds.length > 0) {
+        formData.dossierIds.forEach((dossierId, index) => {
+          formDataPayload.append('dossier_ids', dossierId);
+        });
+      }
       if (formData.confidence !== null) {
         formDataPayload.append('confidence', formData.confidence);
       }
