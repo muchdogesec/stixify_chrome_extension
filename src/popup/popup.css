@@ -175,6 +175,130 @@ body {
 /* Form Styles */
 .form-group {
   margin-bottom: 16px;
+  position: relative;
+}
+
+/* Dossier Selector */
+.dossier-selector {
+  position: relative;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background-color: #fafafa;
+  transition: all 0.2s ease;
+  padding: 8px;
+}
+
+.dossier-selector:hover,
+.dossier-selector:focus-within {
+  border-color: #4CAF50;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.dossier-selected-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.dossier-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(76, 175, 80, 0.2);
+}
+
+.remove-chip {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  transition: all 0.2s;
+}
+
+.remove-chip:hover {
+  transform: scale(1.2);
+  opacity: 0.9;
+}
+
+.dossier-input {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.dossier-input:focus {
+  outline: none;
+}
+
+.dossier-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.dossier-item {
+  padding: 10px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dossier-item:hover {
+  background-color: #f5f5f5;
+}
+
+.dossier-item.empty {
+  cursor: default;
+  color: #999;
+  text-align: center;
+  padding: 16px;
+}
+
+.dossier-item.empty:hover {
+  background-color: #fff;
+}
+
+.dossier-name {
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+}
+
+.dossier-meta {
+  font-size: 12px;
+  color: #999;
+  margin-top: 2px;
 }
 
 .confidence-section {
@@ -369,15 +493,56 @@ select:focus {
 
 .source-item {
   display: flex;
-  gap: 8px;
+  flex-direction: column;
+  gap: 4px;
   margin-bottom: 8px;
 }
 
-.source-item input {
-  flex: 1;
+.source-item > div:first-child {
+  display: flex;
+  gap: 8px;
 }
 
-.source-item button {
+.source-item.has-error .source-input {
+  border-color: #f44336;
+  background-color: #ffebee;
+}
+
+.source-input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+  font-family: inherit;
+  background-color: #fafafa;
+  transition: all 0.2s ease;
+}
+
+.source-input:hover {
+  border-color: #4CAF50;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.source-input:focus {
+  outline: none;
+  border-color: #4CAF50;
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+.source-input.input-error {
+  border-color: #f44336;
+  background-color: #ffebee;
+}
+
+.source-input.input-error:focus {
+  box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
+}
+
+.source-item > div:first-child > button {
   padding: 8px 12px;
   background-color: #f44336;
   color: white;
@@ -388,88 +553,109 @@ select:focus {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
-.source-item button:hover {
+.source-item > div:first-child > button:hover {
   background-color: #da190b;
 }
 
-/* Labels Tags */
-.labels-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
-  padding: 6px 8px;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  background-color: #fafafa;
-  transition: all 0.2s ease;
-  min-height: 40px;
+/* Labels List */
+.labels-list {
+  margin-bottom: 8px;
 }
 
-.labels-container:hover,
-.labels-container:focus-within {
+.label-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.label-item > div:first-child {
+  display: flex;
+  gap: 8px;
+}
+
+.label-item.has-error .label-input {
+  border-color: #f44336;
+  background-color: #ffebee;
+}
+
+.label-input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+  font-family: inherit;
+  background-color: #fafafa;
+  transition: all 0.2s ease;
+}
+
+.label-input:hover {
   border-color: #4CAF50;
   background-color: #fff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.label-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  align-items: center;
+.label-input:focus {
+  outline: none;
+  border-color: #4CAF50;
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
 }
 
-.label-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 10px;
-  background-color: #4CAF50;
+.label-input.input-error {
+  border-color: #f44336;
+  background-color: #ffebee;
+}
+
+.label-input.input-error:focus {
+  box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
+}
+
+.label-item > div:first-child > button {
+  padding: 8px 12px;
+  background-color: #f44336;
   color: white;
-  border-radius: 14px;
-  font-size: 13px;
-  font-weight: 500;
-  white-space: nowrap;
-  box-shadow: 0 1px 3px rgba(76, 175, 80, 0.2);
-}
-
-.tag-remove {
-  background: none;
   border: none;
-  color: white;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
-  padding: 0;
-  margin: 0;
-  line-height: 1;
+  font-size: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 16px;
-  height: 16px;
-  transition: all 0.2s;
+  flex-shrink: 0;
 }
 
-.tag-remove:hover {
-  transform: scale(1.2);
-  opacity: 0.9;
+.label-item > div:first-child > button:hover {
+  background-color: #da190b;
 }
 
-.labels-input {
-  flex: 1;
-  min-width: 80px;
-  padding: 6px 4px !important;
-  border: none !important;
-  background: transparent !important;
-  font-size: 14px;
-  height: auto;
+.error-message {
+  font-size: 12px;
+  color: #f44336;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.labels-input:focus {
-  outline: none;
+.convert-btn {
+  background: none;
+  border: none;
+  color: #2196F3;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0;
+  margin: 0;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.convert-btn:hover {
+  color: #1976d2;
 }
 
 /* Buttons */

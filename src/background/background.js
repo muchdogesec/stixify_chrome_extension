@@ -57,6 +57,13 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     })
     return true
   }
+
+  if (request.action === 'fetchDossiers') {
+    fetchDossiers(request.apiKey, request.apiEndpoint)
+      .then(sendResponse)
+      .catch(error => sendResponse({ error: error.message }))
+    return true
+  }
 })
 
 // Check if content type is HTML
@@ -339,5 +346,45 @@ function notifyPopupOfRefreshError (hasError) {
     // Popup might not be open, ignore error
   })
 }
+
+// Fetch all dossiers from API with pagination
+async function fetchAllDossiers (apiKey, apiEndpoint) {
+  const allDossiers = [];
+  let page = 1;
+  let hasMore = true;
+
+  while (hasMore) {
+    const endpoint = `${apiEndpoint || 'https://api.stixify.com'}/v1/dossiers/?show_only_my_dossiers=true&sort=created_descending&page=${page}`
+
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      headers: {
+        'API-KEY': apiKey,
+        'Content-Type': 'application/json'
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error(`API returned ${response.status}: ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    allDossiers.push(...(data.results || []))
+
+    hasMore = data.page_number * data.page_size < data.total_results_count
+    page++
+  }
+
+  return {
+    dossiers: allDossiers,
+    latestCreatedAt: allDossiers.length > 0 ? allDossiers[0].created_at : null
+  }
+}
+
+// Fetch dossiers from API
+async function fetchDossiers (apiKey, apiEndpoint) {
+  return fetchAllDossiers(apiKey, apiEndpoint)
+}
+
 
 console.log('Stixify background service worker loaded')
